@@ -10,8 +10,9 @@
         :submitted="i < state.currentGuessIndex"
       />
     </div>
-    <p v-if="wonGame" class="text-center font-bold">
-      🍻 Congratulations! Mel would be proud.
+    <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
+      <span>🍻 Congratulations! Mel would be proud.</span>
+      <a @click="share" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Share</a>
     </p>
     <p v-else-if="lostGame" class="text-center font-bold">
       😞 Out of tries. No Timmy Taylors for you.
@@ -40,7 +41,8 @@ const state = reactive({
     miss: [],
     found: [],
     hint: []
-  }
+  },
+  sharedData: false
 })
 
 const wonGame = computed(() => 
@@ -82,6 +84,20 @@ const handleInput = (key) => {
   }
 }
 
+const share = async () => {
+  if (!wonGame)
+    return;
+  const shareData = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+  try {
+    console.log('share reached')
+    await navigator.share(shareData)
+    state.sharedData = true
+  } catch (err) {
+    state.sharedData = false
+    throw new Error("Error: ", err)
+  }
+}
+
 onMounted(() => {
   window.addEventListener("keyup", (e) => {
     e.preventDefault()
@@ -94,5 +110,4 @@ onMounted(() => {
     handleInput(key)
   })
 })
-
 </script>
