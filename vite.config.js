@@ -6,7 +6,7 @@ export default ({ mode }) => {
   process.env = {...process.env, ...loadEnv(mode, process.cwd())}
   return defineConfig({
     plugins: [vue()],
-    publicDir: process.env.NODE_ENV === "production" ? "/vue-meldle" : '/'
+    base: process.env.NODE_ENV === "production" ? "/vue-meldle" : '/'
   })
 }
   
