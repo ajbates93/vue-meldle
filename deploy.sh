@@ -8,7 +8,7 @@ echo 'after build'
 cd dist
 echo 'cd dist'
 # if you are deploying to a custom domain
-# echo 'www.example.com' > CNAME
+echo 'https://ajbates93.github.io/vue-meldle/' > CNAME
 git init
 git add -A
 git commit -m 'deploy'
