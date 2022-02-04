@@ -8,7 +8,9 @@ echo 'after build'
 cd dist
 echo 'cd dist'
 git init
+echo 'after init'
 git add -A
+echo 'after add -A'
 git commit -m 'deploy'
 echo 'after commit'
 git push -f git@github.com:ajbates93/vue-meldle.git master:gh-pages
