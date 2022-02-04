@@ -27,9 +27,13 @@
 import { onMounted, reactive, computed } from "vue";
 import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
+import { getWordOfTheDay } from './utils'
+
+const today = new Date()
+const date = new Date(today).toDateString()
 
 const state = reactive({
-  solution: "melba",
+  solution: getWordOfTheDay(date),
   guesses: ["", "", "", "", "", ""],
   currentGuessIndex: 0,
   guessedLetters: {
