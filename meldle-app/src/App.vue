@@ -11,10 +11,10 @@
       />
     </div>
     <p v-if="wonGame" class="text-center font-bold">
-      Congratulations! Mel would be proud.
+      🍻 Congratulations! Mel would be proud.
     </p>
     <p v-else-if="lostGame" class="text-center font-bold">
-      Out of tries. No Timmy Taylors for you.
+      😞 Out of tries. No Timmy Taylors for you.
     </p>
     <simple-keyboard 
       @onKeyPress="handleInput" 
@@ -29,7 +29,7 @@ import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
 
 const state = reactive({
-  solution: "books",
+  solution: "melba",
   guesses: ["", "", "", "", "", ""],
   currentGuessIndex: 0,
   guessedLetters: {
