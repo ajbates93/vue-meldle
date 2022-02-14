@@ -23,10 +23,14 @@ onMounted(() => {
   keyboard.value = new Keyboard("simple-keyboard", {
     layout: {
       default: [
-        "q w e r t y u i o p",
-        "a s d f g h j k l",
-        "{enter} z x c v b n m {bksp}",
+        "Q W E R T Y U I O P",
+        "A S D F G H J K L",
+        "{enter} Z X C V B N M {bksp}",
       ],
+    },
+    display: {
+      '{bksp}': '❌',
+      '{enter}': '✅'
     },
     onKeyPress
   })
@@ -59,11 +63,11 @@ div.miss {
   color: #fff;
 }
 div.found {
-  background-color: green !important;
+  background-color: #16a34a !important;
   color: #fff;
 }
 div.hint:not(.found) {
-  background-color: yellow !important;
+  background-color: #eab308 !important;
   color: #fff;
 }
 </style>

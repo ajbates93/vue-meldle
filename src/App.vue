@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly">
-    <h1 class="flex justify-center text-3xl font-bold pt-3">MELDLE</h1>
+  <Header />
+  <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app">
     <div>
       <word-row
         v-for="(guess, i) in state.guesses"
@@ -12,7 +12,8 @@
     </div>
     <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
       <span>🍻 Congratulations! Mel would be proud.</span>
-      <a @click="share" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Share</a>
+      <a v-if="webShareApiSupported" @click="share" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Share</a>
+      <a v-else @click="copyResults" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Copy Results</a>
     </p>
     <p v-else-if="lostGame" class="text-center font-bold">
       😞 Out of tries. No Timmy Taylors for you.
@@ -28,6 +29,7 @@
 import { onMounted, reactive, computed } from "vue";
 import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
+import Header from './components/Header.vue'
 import { getWordOfTheDay } from './utils'
 
 const today = new Date()
@@ -87,16 +89,45 @@ const handleInput = (key) => {
 const share = async () => {
   if (!wonGame)
     return;
-  const shareData = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
   try {
     console.log('share reached')
-    await navigator.share(shareData)
+    await navigator.share({
+      title: 'MELDLE RESULTS',
+      text: shareDataText,
+      url: 'https://ajbates93.github.io/vue-meldle/'
+    })
     state.sharedData = true
   } catch (err) {
     state.sharedData = false
     throw new Error("Error: ", err)
   }
 }
+
+const copyResults = async () => {
+  if (!wonGame)
+    return;
+  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+  try {
+    console.log('copy reached')
+    var type = "text/plain"
+    var blob = new Blob([shareDataText], { type })
+    var data = [new ClipboardItem({ [type]: blob })]
+
+    navigator.clipboard.write(data).then(() => {
+      console.log('successfully written to clipboard!')
+    })
+    .catch((err) => {
+      console.log('could not write data to clipboard: ', err)
+    })
+  } catch (err) {
+    throw new Error('could not write data to clipboard: ', err)
+  }
+}
+
+const webShareApiSupported = computed(() => {
+  return navigator.share
+})
 
 onMounted(() => {
   window.addEventListener("keyup", (e) => {
@@ -106,8 +137,14 @@ onMounted(() => {
         ? "{enter}"
         : e.keyCode == 8
         ? "{bksp}"
-        : String.fromCharCode(e.keyCode).toLowerCase()
+        : String.fromCharCode(e.keyCode).toUpperCase()
     handleInput(key)
   })
 })
 </script>
+
+<style>
+.meldle-app {
+  min-height: 650px;
+}
+</style>
