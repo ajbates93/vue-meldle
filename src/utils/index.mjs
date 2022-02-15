@@ -10,6 +10,10 @@ const words = [
   {word: "smell", date: new Date("02/12/2022").toDateString()},
   {word: "haway", date: new Date("02/13/2022").toDateString()},
   {word: "AROSE", date: new Date("02/14/2022").toDateString()},
+  {word: "TRISS", date: new Date("02/15/2022").toDateString()},
+  {word: "LEEDS", date: new Date("02/16/2022").toDateString()},
+  {word: "RUGBY", date: new Date("02/17/2022").toDateString()},
+  {word: "FRANK", date: new Date("02/18/2022").toDateString()},
 ];
 
 const getWordOfTheDay = (date) => {
