@@ -8,15 +8,16 @@
         :value="guess"
         :solution="state.solution"   
         :submitted="i < state.currentGuessIndex"
+        @submitColourRow="submitToColourRow"
       />
     </div>
     <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
       <span>🍻 Congratulations! Mel would be proud.</span>
-      <a v-if="webShareApiSupported" @click="share" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Share</a>
-      <a v-else @click="copyResults" class="mt-2 w-14 bg-green-600 text-white button font-bold py-1 px-2">Copy Results</a>
+      <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-green-600 text-white button font-bold py-2 px-3">Share</a>
     </p>
-    <p v-else-if="lostGame" class="text-center font-bold">
+    <p v-else-if="lostGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
       😞 Out of tries. No Timmy Taylors for you.
+      <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-red-600 text-white button font-bold py-2 px-3">Share</a>
     </p>
     <simple-keyboard 
       @onKeyPress="handleInput" 
@@ -38,13 +39,17 @@ const date = new Date(today).toDateString()
 const state = reactive({
   solution: getWordOfTheDay(date),
   guesses: ["", "", "", "", "", ""],
+  coloursGrid: [[],[],[],[],[],[]],
   currentGuessIndex: 0,
   guessedLetters: {
     miss: [],
     found: [],
     hint: []
   },
-  sharedData: false
+  sharedData: false,
+  setColourGrid(colours, index) {
+    this.coloursGrid[index].value = colours
+  }
 })
 
 const wonGame = computed(() => 
@@ -86,18 +91,23 @@ const handleInput = (key) => {
   }
 }
 
-const share = async () => {
-  if (!wonGame)
-    return;
-  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+const share = () => {
+  const shareDataText = wonGame 
+    ? `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.\n\n${getShareDataProgressGrid.value}\n\n Diddleberg.`
+    : `SHAME UPON ME AND MY FAMILY! 💀 I FAILED TODAY'S MELDLE AND HAVE FORFEITED ALL RIGHTS TO FUTURE WENCHING.\n\n${getShareDataProgressGrid.value}\n\n No Diddleberg.`
   try {
-    console.log('share reached')
-    await navigator.share({
+    navigator.share({
       title: 'MELDLE RESULTS',
       text: shareDataText,
       url: 'https://ajbates93.github.io/vue-meldle/'
     })
-    state.sharedData = true
+    .then(() => {
+      state.sharedData = true
+    })
+    .catch((err) => {
+      state.sharedData = false
+      throw new Error("Error: ", err)  
+    })
   } catch (err) {
     state.sharedData = false
     throw new Error("Error: ", err)
@@ -124,6 +134,46 @@ const copyResults = async () => {
     throw new Error('could not write data to clipboard: ', err)
   }
 }
+
+const submitToColourRow = (colours) => {
+  const values = colours
+  const index = state.currentGuessIndex
+  Object.assign(state.coloursGrid[state.currentGuessIndex - 1], colours)
+  // state.coloursGrid[state.currentGuessIndex - 1].value = colours
+  // state.setColourGrid(values, state.currentGuessIndex - 1)
+}
+
+const getShareDataProgressGrid = computed(() => {
+  const miss = '⬜'
+  const hint = '🟨'
+  const hit = '🟩'
+
+
+  let rawGrid = JSON.parse(JSON.stringify(state.coloursGrid))
+  let newGrid = []
+
+  for (var i = 0; i < rawGrid.length; i++) {
+    let guess = rawGrid[i]
+    newGrid.push([])
+    for (var x = 0; x < guess.length; x++) {
+      let letter = guess[x]
+      let newGuess = newGrid[i]
+      if (letter == 'gray')
+        newGuess.push(miss)
+      if (letter == 'green')
+        newGuess.push(hit)
+      if (letter == 'yellow')
+        newGuess.push(hint)
+      newGuess.join('')
+    }
+  }
+  
+  let gridString = newGrid.join('\n').replaceAll(',','')
+  let pos = gridString.lastIndexOf('\n\n')
+  if (pos !== -1)
+    gridString = gridString.substring(0, pos)
+  return gridString
+})
 
 const webShareApiSupported = computed(() => {
   return navigator.share

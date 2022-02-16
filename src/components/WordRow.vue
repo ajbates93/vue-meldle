@@ -18,6 +18,8 @@ const props = defineProps({
   submitted: Boolean
 })
 
+const emit = defineEmits(['submitColourRow'])
+
 const colours = ref(["", "", "", "", ""])
 
 watch(
@@ -48,6 +50,7 @@ watch(
         colours.value[i] = temp[i]
         await new Promise((resolve) => setTimeout(resolve, 200))
       }
+      emit('submitColourRow', Object.values(colours.value))
     }
   }
 )
