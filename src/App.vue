@@ -54,6 +54,27 @@ const state = reactive({
   sharedData: false
 })
 
+const statsState = reactive({
+  averageGuesses: 0,
+  currentStreak: 0,
+  gamesPlayed: 0,
+  gamesWon: 0,
+  guesses: {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0, 
+    fail: 0,
+  },
+  maxStreak: 0,
+  winPercentage: 100,
+  lastPlayed: '',
+  lastWon: ''
+})
+
+
 const wonGame = computed(() => 
   state.guesses[state.currentGuessIndex - 1] === state.solution
 )
@@ -195,6 +216,26 @@ const updateProgress = () => {
   const today = new Date().toDateString()
   const progress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
   window.localStorage.setItem("meldle-progress", progress)
+  updateStats()
+}
+
+const updateStats = () => {
+  const stats = {...statsState}
+  if (stats.lastPlayed !== date) {
+    stats.gamesPlayed++
+    stats.lastPlayed = date
+  }
+  if (wonGame.value && stats.lastWon !== date) {
+    stats.gamesWon++
+    stats.lastWon = date
+  }
+  
+  // push stats
+  const newStats = JSON.stringify({...stats})
+  window.localStorage.setItem("meldle-stats", newStats)
+
+  // re-fetch stats
+  fetchStats()
 }
 
 const fetchProgress = () => {
@@ -218,8 +259,19 @@ const fetchProgress = () => {
   }
 }
 
+const fetchStats = () => {
+  const stats = JSON.parse(localStorage.getItem("meldle-stats"))
+  if (!stats) {
+    const newStats = JSON.stringify({ ...statsState })
+    window.localStorage.setItem("meldle-stats", newStats)
+  } else {
+    Object.assign(statsState, stats)
+  }
+}
+
 onMounted(() => {
   fetchProgress()
+  fetchStats()
   window.addEventListener("keyup", (e) => {
     e.preventDefault()
     let key = 
