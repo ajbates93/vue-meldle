@@ -18,6 +18,18 @@ const words = [
   {word: "STOUT", date: new Date("02/20/2022").toDateString()},
 ];
 
+const validateGuess = async (guess) => {
+  const lc = guess.toLowerCase()
+  
+  const allowed = await fetch('allowed.txt')
+    .then(response => response.text())
+  
+  const aWords = allowed.split("\n")
+
+  const valid = aWords.includes(lc)
+  return valid
+}
+
 const getWordOfTheDay = (date) => {
   const wordIndex = words.findIndex(x => x.date == date)
   if (wordIndex === -1)
@@ -26,4 +38,4 @@ const getWordOfTheDay = (date) => {
     return words[wordIndex].word
 }
 
-export { getWordOfTheDay }
+export { getWordOfTheDay, validateGuess }

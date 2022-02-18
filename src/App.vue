@@ -1,6 +1,7 @@
 <template>
   <Header />
-  <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app">
+  <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app relative">
+    <div class="absolute top-10 left-2/4 text-center p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
     <div>
       <word-row
         v-for="(guess, i) in state.guesses"
@@ -8,6 +9,7 @@
         :value="guess"
         :solution="state.solution"   
         :submitted="i < state.currentGuessIndex"
+        :shake="state.invalidGuess && state.currentGuessIndex === i"
         @submitColourRow="submitToColourRow"
       />
     </div>
@@ -31,7 +33,7 @@ import { onMounted, reactive, computed } from "vue";
 import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
 import Header from './components/Header.vue'
-import { getWordOfTheDay } from './utils'
+import { getWordOfTheDay, validateGuess } from './utils'
 
 const today = new Date()
 const date = new Date(today).toDateString()
@@ -40,16 +42,14 @@ const state = reactive({
   solution: getWordOfTheDay(date),
   guesses: ["", "", "", "", "", ""],
   coloursGrid: [[],[],[],[],[],[]],
+  invalidGuess: false,
   currentGuessIndex: 0,
   guessedLetters: {
     miss: [],
     found: [],
     hint: []
   },
-  sharedData: false,
-  setColourGrid(colours, index) {
-    this.coloursGrid[index].value = colours
-  }
+  sharedData: false
 })
 
 const wonGame = computed(() => 
@@ -60,23 +60,34 @@ const lostGame = computed(() => !wonGame.value
   && state.currentGuessIndex >= 6
 )
 
-const handleInput = (key) => {
+const handleInvalidGuess = () => {
+  state.invalidGuess = true
+  setTimeout(() => state.invalidGuess = false, 1500)
+}
+
+const handleInput = async (key) => {
   if (state.currentGuessIndex >= 6 || wonGame.value)
     return;
   const currentGuess = state.guesses[state.currentGuessIndex]
   if (key == "{enter}") {
-    // SEND GUESS
-    if (currentGuess.length == 5) {
-      state.currentGuessIndex++
-      // HANDLE GUESSES
-      for (var i = 0; i < currentGuess.length; i++) {
-        let c = currentGuess.charAt(i)
-        if (c == state.solution.charAt(i))
-          state.guessedLetters.found.push(c)
-        else if (state.solution.indexOf(c) != -1)
-          state.guessedLetters.hint.push(c)
-        else
-          state.guessedLetters.miss.push(c)
+    // VALIDATE GUESS
+    const valid = await validateGuess(currentGuess)
+    if (!valid) {
+      handleInvalidGuess()
+    } else {
+      // SEND GUESS
+      if (currentGuess.length == 5) {
+        state.currentGuessIndex++
+        // HANDLE GUESSES
+        for (var i = 0; i < currentGuess.length; i++) {
+          let c = currentGuess.charAt(i)
+          if (c == state.solution.charAt(i))
+            state.guessedLetters.found.push(c)
+          else if (state.solution.indexOf(c) != -1)
+            state.guessedLetters.hint.push(c)
+          else
+            state.guessedLetters.miss.push(c)
+        }
       }
     }
   } else if (key == "{bksp}") {
@@ -139,8 +150,6 @@ const submitToColourRow = (colours) => {
   const values = colours
   const index = state.currentGuessIndex
   Object.assign(state.coloursGrid[state.currentGuessIndex - 1], colours)
-  // state.coloursGrid[state.currentGuessIndex - 1].value = colours
-  // state.setColourGrid(values, state.currentGuessIndex - 1)
 }
 
 const getShareDataProgressGrid = computed(() => {
