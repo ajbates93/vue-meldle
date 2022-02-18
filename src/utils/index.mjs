@@ -16,6 +16,14 @@ const words = [
   {word: "FRANK", date: new Date("02/18/2022").toDateString()},
   {word: "SWORD", date: new Date("02/19/2022").toDateString()},
   {word: "STOUT", date: new Date("02/20/2022").toDateString()},
+  {word: "GRUNT", date: new Date("02/21/2022").toDateString()},
+  {word: "BUXOM", date: new Date("02/22/2022").toDateString()},
+  {word: "SHEEP", date: new Date("02/23/2022").toDateString()},
+  {word: "LUNNY", date: new Date("02/24/2022").toDateString()},
+  {word: "FAITH", date: new Date("02/25/2022").toDateString()},
+  {word: "BRUSH", date: new Date("02/26/2022").toDateString()},
+  {word: "TROUT", date: new Date("02/27/2022").toDateString()},
+  {word: "BASIL", date: new Date("02/28/2022").toDateString()},
 ];
 
 const validateGuess = async (guess) => {
