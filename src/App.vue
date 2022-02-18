@@ -193,7 +193,7 @@ const webShareApiSupported = computed(() => {
 
 const updateProgress = () => {
   const today = new Date().toDateString()
-  const progress = JSON.stringify({ date: today, guesses: state.guesses })
+  const progress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
   window.localStorage.setItem("meldle-progress", progress)
 }
 
@@ -203,17 +203,18 @@ const fetchProgress = () => {
   
   if (!progress) {
     // if guesses don't exist, store blank guesses
-    const newProgress = JSON.stringify({ date: today, guesses: state.guesses })
+    const newProgress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
     window.localStorage.setItem("meldle-progress", newProgress)
   } else if (progress && (progress.date !== today)) {
     // if guesses exist but dates don't match, remove old dates and store new blank
     window.localStorage.removeItem("meldle-progress")
 
-    const newProgress = JSON.stringify({ date: today, guesses: state.guesses })
+    const newProgress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
     window.localStorage.setItem("meldle-progress", newProgress)
   } else {
     // retrieve current guesses
     state.guesses = progress.guesses
+    state.currentGuessIndex = progress.currentGuessIndex
   }
 }
 
