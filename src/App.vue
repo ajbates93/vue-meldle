@@ -25,6 +25,7 @@
       @onKeyPress="handleInput" 
       :guessedLetters="state.guessedLetters"
     />
+    <settings />
   </div>
 </template>
 
@@ -33,6 +34,7 @@ import { onMounted, reactive, computed } from "vue";
 import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
 import Header from './components/Header.vue'
+import Settings from './components/Settings.vue'
 import { getWordOfTheDay, validateGuess } from './utils'
 
 const today = new Date()
@@ -88,6 +90,7 @@ const handleInput = async (key) => {
           else
             state.guessedLetters.miss.push(c)
         }
+        updateProgress()
       }
     }
   } else if (key == "{bksp}") {
@@ -188,7 +191,34 @@ const webShareApiSupported = computed(() => {
   return navigator.share
 })
 
+const updateProgress = () => {
+  const today = new Date().toDateString()
+  const progress = JSON.stringify({ date: today, guesses: state.guesses })
+  window.localStorage.setItem("meldle-progress", progress)
+}
+
+const fetchProgress = () => {
+  const progress = JSON.parse(localStorage.getItem("meldle-progress"))
+  const today = new Date().toDateString()
+  
+  if (!progress) {
+    // if guesses don't exist, store blank guesses
+    const newProgress = JSON.stringify({ date: today, guesses: state.guesses })
+    window.localStorage.setItem("meldle-progress", newProgress)
+  } else if (progress && (progress.date !== today)) {
+    // if guesses exist but dates don't match, remove old dates and store new blank
+    window.localStorage.removeItem("meldle-progress")
+
+    const newProgress = JSON.stringify({ date: today, guesses: state.guesses })
+    window.localStorage.setItem("meldle-progress", newProgress)
+  } else {
+    // retrieve current guesses
+    state.guesses = progress.guesses
+  }
+}
+
 onMounted(() => {
+  fetchProgress()
   window.addEventListener("keyup", (e) => {
     e.preventDefault()
     let key = 
