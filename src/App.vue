@@ -1,7 +1,7 @@
 <template>
   <Header />
   <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app relative">
-    <div class="absolute top-10 left-2/4 text-center p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="store.state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
+    <div class="absolute top-10 left-2/4 text-center z-50 p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="store.state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
     <div>
       <word-row
         v-for="(guess, i) in store.state.guesses"
