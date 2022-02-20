@@ -1,15 +1,15 @@
 <template>
   <Header />
   <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app relative">
-    <div class="absolute top-10 left-2/4 text-center p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
+    <div class="absolute top-10 left-2/4 text-center p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="store.state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
     <div>
       <word-row
-        v-for="(guess, i) in state.guesses"
+        v-for="(guess, i) in store.state.guesses"
         :key="i"
         :value="guess"
-        :solution="state.solution"   
-        :submitted="i < state.currentGuessIndex"
-        :shake="state.invalidGuess && state.currentGuessIndex === i"
+        :solution="store.state.solution"   
+        :submitted="i < store.state.currentGuessIndex"
+        :shake="store.state.invalidGuess && store.state.currentGuessIndex === i"
         @submitColourRow="submitToColourRow"
       />
     </div>
@@ -23,52 +23,53 @@
     </p>
     <simple-keyboard 
       @onKeyPress="handleInput" 
-      :guessedLetters="state.guessedLetters"
+      :guessedLetters="store.state.guessedLetters"
     />
+    <settings />
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, computed } from "vue";
+import { useStore } from 'vuex'
+import { useStoreModule } from './composables'
 import SimpleKeyboard from "./components/SimpleKeyboard.vue"
 import WordRow from './components/WordRow.vue'
 import Header from './components/Header.vue'
-import { getWordOfTheDay, validateGuess } from './utils'
+import Settings from './components/Settings.vue'
+import { validateGuess } from './utils'
+
+// const { actions } = useStoreModule('stats')
 
 const today = new Date()
 const date = new Date(today).toDateString()
 
-const state = reactive({
-  solution: getWordOfTheDay(date),
-  guesses: ["", "", "", "", "", ""],
-  coloursGrid: [[],[],[],[],[],[]],
-  invalidGuess: false,
-  currentGuessIndex: 0,
-  guessedLetters: {
-    miss: [],
-    found: [],
-    hint: []
-  },
-  sharedData: false
-})
+const store = useStore()
 
 const wonGame = computed(() => 
-  state.guesses[state.currentGuessIndex - 1] === state.solution
+  store.state.guesses[store.state.currentGuessIndex - 1] === store.state.solution
 )
 
 const lostGame = computed(() => !wonGame.value
-  && state.currentGuessIndex >= 6
+  && store.state.currentGuessIndex >= 6
 )
 
+const fetchStats = () => {
+  return mapActions(['fetchStats'])
+}
+const updateAndFetchStats = () => {
+  return mapActions(['updateAndFetchStats'])
+}
+
 const handleInvalidGuess = () => {
-  state.invalidGuess = true
-  setTimeout(() => state.invalidGuess = false, 1500)
+  commit('SET_INVALID_GUESS', true)
+  setTimeout(() => commit('SET_INVALID_GUESS', false), 1500)
 }
 
 const handleInput = async (key) => {
-  if (state.currentGuessIndex >= 6 || wonGame.value)
+  if (store.state.currentGuessIndex >= 6 || wonGame.value)
     return;
-  const currentGuess = state.guesses[state.currentGuessIndex]
+  const currentGuess = store.state.guesses[store.state.currentGuessIndex]
   if (key == "{enter}") {
     // VALIDATE GUESS
     const valid = await validateGuess(currentGuess)
@@ -77,34 +78,36 @@ const handleInput = async (key) => {
     } else {
       // SEND GUESS
       if (currentGuess.length == 5) {
-        state.currentGuessIndex++
+        store.commit('INCREMENT_CURRENT_GUESS_INDEX')
         // HANDLE GUESSES
         for (var i = 0; i < currentGuess.length; i++) {
           let c = currentGuess.charAt(i)
-          if (c == state.solution.charAt(i))
-            state.guessedLetters.found.push(c)
-          else if (state.solution.indexOf(c) != -1)
-            state.guessedLetters.hint.push(c)
+          if (c == store.state.solution.charAt(i))
+            store.commit('ADD_TO_GUESSED_LETTERS_FOUND', c)
+          else if (store.state.solution.indexOf(c) != -1)
+            store.commit('ADD_TO_GUESSED_LETTERS_HINT', c)
           else
-            state.guessedLetters.miss.push(c)
+            store.commit('ADD_TO_GUESSED_LETTERS_MISS', c)
         }
+        // update progress and stats      
+        store.dispatch('updateProgress')
+        store.dispatch('stats/updateAndFetchStats', {wonGame: wonGame.value, lostGame: lostGame.value, currentGuessIndex: lostGame.value ? 'fail' : store.state.currentGuessIndex})
       }
     }
   } else if (key == "{bksp}") {
     // REMOVE LAST LETTER
-    state.guesses[state.currentGuessIndex] =
-      currentGuess.slice(0, -1)
+    store.commit('REMOVE_LAST_LETTER', {index: store.state.currentGuessIndex, value: currentGuess})
   } else if (currentGuess.length < 5) {
     // ADD LETTER IF ALPHABETICAL
     const alphaRegex = /[a-zA-Z]/;
     if (alphaRegex.test(key))
-      state.guesses[state.currentGuessIndex] += key
+      store.commit('ADD_LETTER', {index: store.state.currentGuessIndex, value: key})
   }
 }
 
 const share = () => {
   const shareDataText = wonGame 
-    ? `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.\n\n${getShareDataProgressGrid.value}\n\n Diddleberg.`
+    ? `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.\n\n${getShareDataProgressGrid.value}\n\n Diddleberg.`
     : `SHAME UPON ME AND MY FAMILY! 💀 I FAILED TODAY'S MELDLE AND HAVE FORFEITED ALL RIGHTS TO FUTURE WENCHING.\n\n${getShareDataProgressGrid.value}\n\n No Diddleberg.`
   try {
     navigator.share({
@@ -113,14 +116,14 @@ const share = () => {
       url: 'https://ajbates93.github.io/vue-meldle/'
     })
     .then(() => {
-      state.sharedData = true
+      store.commit('UPDATE_SHARED_DATA', true)
     })
     .catch((err) => {
-      state.sharedData = false
+      store.commit('UPDATE_SHARED_DATA', false)
       throw new Error("Error: ", err)  
     })
   } catch (err) {
-    state.sharedData = false
+    store.commit('UPDATE_SHARED_DATA', false)
     throw new Error("Error: ", err)
   }
 }
@@ -128,7 +131,7 @@ const share = () => {
 const copyResults = async () => {
   if (!wonGame)
     return;
-  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${state.currentGuessIndex} ${state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
   try {
     console.log('copy reached')
     var type = "text/plain"
@@ -147,9 +150,7 @@ const copyResults = async () => {
 }
 
 const submitToColourRow = (colours) => {
-  const values = colours
-  const index = state.currentGuessIndex
-  Object.assign(state.coloursGrid[state.currentGuessIndex - 1], colours)
+  store.commit('SUBMIT_TO_COLOUR_ROW', {index: store.state.currentGuessIndex - 1, value: colours})
 }
 
 const getShareDataProgressGrid = computed(() => {
@@ -158,7 +159,7 @@ const getShareDataProgressGrid = computed(() => {
   const hit = '🟩'
 
 
-  let rawGrid = JSON.parse(JSON.stringify(state.coloursGrid))
+  let rawGrid = JSON.parse(JSON.stringify(store.state.coloursGrid))
   let newGrid = []
 
   for (var i = 0; i < rawGrid.length; i++) {
@@ -188,7 +189,16 @@ const webShareApiSupported = computed(() => {
   return navigator.share
 })
 
+// const getWinPercentage = (played, won) => {
+//   const p = Number(played)
+//   const w = Number(won)
+//   return (w / p) * 100
+// }
+
 onMounted(() => {
+  store.dispatch('fetchProgress')
+  store.dispatch('stats/fetchStats')
+  // actions.fetchStats()
   window.addEventListener("keyup", (e) => {
     e.preventDefault()
     let key = 

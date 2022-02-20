@@ -32,7 +32,7 @@ const validateGuess = async (guess) => {
   const allowed = await fetch('allowed.txt')
     .then(response => response.text())
   
-  const aWords = allowed.split("\n")
+  const aWords = allowed.split("\r\n")
 
   const valid = aWords.includes(lc)
   return valid
