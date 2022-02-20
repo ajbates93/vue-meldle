@@ -62,8 +62,8 @@ const updateAndFetchStats = () => {
 }
 
 const handleInvalidGuess = () => {
-  commit('SET_INVALID_GUESS', true)
-  setTimeout(() => commit('SET_INVALID_GUESS', false), 1500)
+  store.commit('SET_INVALID_GUESS', true)
+  setTimeout(() => store.commit('SET_INVALID_GUESS', false), 1500)
 }
 
 const handleInput = async (key) => {
