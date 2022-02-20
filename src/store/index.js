@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import { getWordOfTheDay } from '../utils/index.mjs'
 
 import stats from './modules/stats'
+import settings from './modules/settings'
 
 const today = new Date()
 const date = new Date(today).toDateString()
@@ -88,7 +89,8 @@ const store = createStore({
     }
   },
   modules: {
-    stats: stats
+    stats: stats,
+    settings: settings
   }
 })
 

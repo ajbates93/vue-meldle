@@ -91,8 +91,7 @@ const handleInput = async (key) => {
         }
         // update progress and stats      
         store.dispatch('updateProgress')
-        if (wonGame.value || lostGame.value)
-          store.dispatch('stats/updateAndFetchStats', {wonGame: wonGame.value, lostGame: lostGame.value, currentGuessIndex: lostGame.value ? 'fail' : store.state.currentGuessIndex})
+        store.dispatch('stats/updateAndFetchStats', {wonGame: wonGame.value, lostGame: lostGame.value, currentGuessIndex: lostGame.value ? 'fail' : store.state.currentGuessIndex})
       }
     }
   } else if (key == "{bksp}") {

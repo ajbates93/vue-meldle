@@ -4,7 +4,8 @@ const today = new Date()
 const date = new Date(today).toDateString()
 
 const state = {
-  averageGuesses: 0,
+  // averageGuesses: 0,
+  winPercentage: 100,
   currentStreak: 0,
   gamesPlayed: 0,
   gamesWon: 0,
@@ -46,10 +47,19 @@ const actions = {
     }
     if (wonGame && stats.lastWon !== date) {
       commit('INCREMENT_GAMES_WON')
+      commit('INCREMENT_CURRENT_STREAK')
       commit('UPDATE_LAST_WON', date)
+      if (stats.currentStreak > stats.maxStreak)
+        commit('UPDATE_MAX_STREAK')
+    }
+    if (lostGame) {
+      commit('RESET_STREAK')
     }
     if ((wonGame || lostGame) && stats.lastCompleted !== date)
       dispatch('updateLastCompleted', currentGuessIndex)
+
+    dispatch('calculateWinPercentage')
+    // dispatch('calculateAverageGuesses')
     
     // push stats
     dispatch('pushStats')
@@ -57,7 +67,17 @@ const actions = {
   updateLastCompleted ({ commit }, currentGuessIndex) {
     commit('UPDATE_RESULT_INDEX_COUNT', currentGuessIndex)
     commit('UPDATE_LAST_COMPLETED', date)
-  }
+  },
+  calculateWinPercentage ({commit, state}) {
+    const value = (state.gamesWon / state.gamesPlayed) * 100
+    commit('UPDATE_WIN_PERCENTAGE', value)
+  },
+  // calculateAverageGuesses ( {commit, state}) {
+  //   let guesses = state.guesses
+  //   delete guesses.fail
+  //   const sum = guesses.reduce((a, b) => a + b, 0)
+  //   const avg = (sum / guesses.length) || 0 
+  // }
 }
 
 const mutations = {
@@ -81,6 +101,18 @@ const mutations = {
   },
   UPDATE_RESULT_INDEX_COUNT: (state, index) => {
     state.guesses[index]++
+  },
+  INCREMENT_CURRENT_STREAK: (state) => {
+    state.currentStreak++
+  },
+  UPDATE_MAX_STREAK: (state, value) => {
+    state.maxStreak = value
+  },
+  RESET_STREAK: (state) => {
+    state.currentStreak = 0
+  },
+  UPDATE_WIN_PERCENTAGE: (state, value) => {
+    state.winPercentage = value
   }
 }
 
