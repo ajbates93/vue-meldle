@@ -49,7 +49,7 @@ const actions = {
       commit('INCREMENT_GAMES_WON')
       commit('INCREMENT_CURRENT_STREAK')
       commit('UPDATE_LAST_WON', date)
-      if (stats.currentStreak > stats.maxStreak)
+      if (stats.currentStreak >= stats.maxStreak)
         commit('UPDATE_MAX_STREAK')
     }
     if (lostGame) {
