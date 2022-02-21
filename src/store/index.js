@@ -3,9 +3,10 @@ import { getWordOfTheDay } from '../utils/index.mjs'
 
 import stats from './modules/stats'
 import settings from './modules/settings'
+import { convertToUTCDate } from '../composables'
 
-const today = new Date()
-const date = new Date(today).toDateString()
+const newDate = new Date()
+const date = convertToUTCDate(newDate)
 
 const store = createStore({
   state() {
@@ -64,17 +65,17 @@ const store = createStore({
   actions: {
     fetchProgress({commit, state}) {
       const progress = JSON.parse(localStorage.getItem("meldle-progress"))
-      const today = new Date().toDateString()
+      
 
       if (!progress) {
         // if guesses don't exist, store blank guesses
-        const newProgress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
+        const newProgress = JSON.stringify({ date: date, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
         window.localStorage.setItem("meldle-progress", newProgress)
-      } else if (progress && (progress.date !== today)) {
+      } else if (progress && (progress.date !== date)) {
         // if guesses exist but dates don't match, remove old dates and store new blank
         window.localStorage.removeItem("meldle-progress")
 
-        const newProgress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
+        const newProgress = JSON.stringify({ date: date, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
         window.localStorage.setItem("meldle-progress", newProgress)
       } else {
         // retrieve current guesses
@@ -83,8 +84,8 @@ const store = createStore({
       }
     },
     updateProgress({state}) {
-      const today = new Date().toDateString()
-      const progress = JSON.stringify({ date: today, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
+      
+      const progress = JSON.stringify({ date: date, guesses: state.guesses, currentGuessIndex: state.currentGuessIndex })
       window.localStorage.setItem("meldle-progress", progress)
     }
   },

@@ -1,7 +1,7 @@
-import { createStore } from 'vuex'
+import { convertToUTCDate } from '../composables'
 
-const today = new Date()
-const date = new Date(today).toDateString()
+const newDate = new Date()
+const date = convertToUTCDate(newDate)
 
 const state = {
   // averageGuesses: 0,
