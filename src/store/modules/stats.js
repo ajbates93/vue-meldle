@@ -1,4 +1,4 @@
-import { convertToUTCDate } from '../composables'
+import { convertToUTCDate } from '../../composables'
 
 const newDate = new Date()
 const date = convertToUTCDate(newDate)

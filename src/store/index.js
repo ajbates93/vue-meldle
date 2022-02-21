@@ -7,11 +7,12 @@ import { convertToUTCDate } from '../composables'
 
 const newDate = new Date()
 const date = convertToUTCDate(newDate)
+const word = getWordOfTheDay(date)
 
 const store = createStore({
   state() {
     return {
-      solution: getWordOfTheDay(date),
+      solution: word,
       guesses: ["", "", "", "", "", ""],
       coloursGrid: [[],[],[],[],[],[]],
       invalidGuess: false,
