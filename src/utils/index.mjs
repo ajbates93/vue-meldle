@@ -24,6 +24,11 @@ const words = [
   {word: "BRUSH", date: new Date("02/26/2022").toDateString()},
   {word: "TROUT", date: new Date("02/27/2022").toDateString()},
   {word: "BASIL", date: new Date("02/28/2022").toDateString()},
+  {word: "MATER", date: new Date("03/01/2022").toDateString()},
+  {word: "GANKS", date: new Date("03/02/2022").toDateString()},
+  {word: "CYBER", date: new Date("03/03/2022").toDateString()},
+  {word: "PLANE", date: new Date("03/04/2022").toDateString()},
+  {word: "BEERS", date: new Date("03/05/2022").toDateString()},
 ];
 
 const validateGuess = async (guess) => {
