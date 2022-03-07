@@ -40,7 +40,7 @@ const actions = {
     window.localStorage.setItem("meldle-stats", stats)
   },
   updateAndFetchStats({state, commit, dispatch}, {wonGame, lostGame, currentGuessIndex}) {
-    const stats = {...state}
+    const stats = state
     if (stats.lastPlayed !== date) {
       commit('INCREMENT_GAMES_PLAYED')
       commit('UPDATE_LAST_PLAYED', date)
@@ -50,7 +50,7 @@ const actions = {
       commit('INCREMENT_CURRENT_STREAK')
       commit('UPDATE_LAST_WON', date)
       if (stats.currentStreak >= stats.maxStreak)
-        commit('UPDATE_MAX_STREAK')
+        commit('UPDATE_MAX_STREAK', stats.currentStreak)
     }
     if (lostGame) {
       commit('RESET_STREAK')
