@@ -8,7 +8,10 @@ export default ({ mode }) => {
     plugins: [
       vue()
     ],
-    base: process.env.NODE_ENV === "production" ? "/vue-meldle/" : '/'
+    base: process.env.NODE_ENV === "production" ? "/vue-meldle/" : '/',
+    build: {
+      target: 'esnext'
+    }
   })
 }
   
