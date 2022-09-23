@@ -30,6 +30,9 @@ const words = [
   {word: "PLANE", date: new Date("03/04/2022").toDateString()},
   {word: "BEERS", date: new Date("03/05/2022").toDateString()},
   {word: "LENIN", date: new Date("03/06/2022").toDateString()},
+  {word: "TRAIN", date: new Date("09/23/2022").toDateString()},
+  {word: "FRANK", date: new Date("09/24/2022").toDateString()},
+  {word: "WENCH", date: new Date("09/25/2022").toDateString()},
 ];
 
 const validateGuess = async (guess) => {
@@ -44,10 +47,18 @@ const validateGuess = async (guess) => {
   return valid
 }
 
-const getWordOfTheDay = (date) => {
+const getWordOfTheDay = async (date) => {
   const wordIndex = words.findIndex(x => x.date == date)
-  if (wordIndex === -1)
-    return "HAWAY"
+  if (wordIndex === -1) {
+    const answers = await fetch('answers.txt')
+      .then(response => response.text())
+
+    const aWords = answers.replace(/(\r\n|\n|\r)/gm, "\n")
+    const lines = aWords.split('\n')
+    const random = lines[Math.floor(Math.random() * lines.length)]
+
+    return random
+  }
   else 
     return words[wordIndex].word
 }

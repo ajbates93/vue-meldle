@@ -32,17 +32,8 @@
 <script setup>
 import { onMounted, reactive, computed } from "vue";
 import { useStore } from 'vuex'
-import { useStoreModule } from './composables'
-import SimpleKeyboard from "./components/SimpleKeyboard.vue"
-import WordRow from './components/WordRow.vue'
-import Header from './components/Header.vue'
-import Settings from './components/Settings.vue'
+import { SimpleKeyboard, WordRow, Header, Settings } from './components'
 import { validateGuess } from './utils'
-
-// const { actions } = useStoreModule('stats')
-
-const today = new Date()
-const date = new Date(today).toDateString()
 
 const store = useStore()
 
@@ -53,13 +44,6 @@ const wonGame = computed(() =>
 const lostGame = computed(() => !wonGame.value
   && store.state.currentGuessIndex >= 6
 )
-
-const fetchStats = () => {
-  return mapActions(['fetchStats'])
-}
-const updateAndFetchStats = () => {
-  return mapActions(['updateAndFetchStats'])
-}
 
 const handleInvalidGuess = () => {
   store.commit('SET_INVALID_GUESS', true)
@@ -198,7 +182,6 @@ const webShareApiSupported = computed(() => {
 onMounted(() => {
   store.dispatch('fetchProgress')
   store.dispatch('stats/fetchStats')
-  // actions.fetchStats()
   window.addEventListener("keyup", (e) => {
     e.preventDefault()
     let key = 

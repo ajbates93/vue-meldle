@@ -7,10 +7,12 @@ import settings from './modules/settings'
 const today = new Date()
 const date = new Date(today).toDateString()
 
+const solution = await getWordOfTheDay(date)
+
 const store = createStore({
   state() {
     return {
-      solution: getWordOfTheDay(date),
+      solution: solution,
       guesses: ["", "", "", "", "", ""],
       coloursGrid: [[],[],[],[],[],[]],
       invalidGuess: false,
