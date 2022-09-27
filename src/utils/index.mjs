@@ -50,17 +50,32 @@ const validateGuess = async (guess) => {
 const getWordOfTheDay = async (date) => {
   const wordIndex = words.findIndex(x => x.date == date)
   if (wordIndex === -1) {
-    const answers = await fetch('answers.txt')
-      .then(response => response.text())
+    const wotd = JSON.parse(localStorage.getItem("meldle-wotd"))
+    if (!wotd || wotd.date !== date) {
+      const answers = await fetch('answers.txt')
+        .then(response => response.text())
+  
+      const aWords = answers.replace(/(\r\n|\n|\r)/gm, "\n")
+      const lines = aWords.split('\n')
+      const random = lines[Math.floor(Math.random() * lines.length)].toUpperCase()
+      const word = { word: random, date: new Date().toDateString() }
+      
+      setWordOfTheDay(word)
 
-    const aWords = answers.replace(/(\r\n|\n|\r)/gm, "\n")
-    const lines = aWords.split('\n')
-    const random = lines[Math.floor(Math.random() * lines.length)]
-
-    return random
+      return word.word
+    }
+    else 
+      return wotd.word
   }
-  else 
-    return words[wordIndex].word
+  else {
+    const word = { word: words[wordIndex].word, date: new Date().toDateString() }
+    setWordOfTheDay(word)
+    return word.word
+  }
+}
+
+const setWordOfTheDay = (word) => {
+  localStorage.setItem("meldle-wotd", JSON.stringify(word))
 }
 
 export { getWordOfTheDay, validateGuess }

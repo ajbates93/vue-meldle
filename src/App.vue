@@ -66,9 +66,10 @@ const handleInput = async (key) => {
         // HANDLE GUESSES
         for (var i = 0; i < currentGuess.length; i++) {
           let c = currentGuess.charAt(i)
-          if (c == store.state.solution.charAt(i))
+          const s = store.state.solution.toUpperCase()
+          if (c == s.charAt(i))
             store.commit('ADD_TO_GUESSED_LETTERS_FOUND', c)
-          else if (store.state.solution.indexOf(c) != -1)
+          else if (s.indexOf(c) != -1)
             store.commit('ADD_TO_GUESSED_LETTERS_HINT', c)
           else
             store.commit('ADD_TO_GUESSED_LETTERS_MISS', c)
