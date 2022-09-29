@@ -98,7 +98,7 @@ const share = () => {
     navigator.share({
       title: 'MELDLE RESULTS',
       text: shareDataText,
-      url: 'https://ajbates93.github.io/vue-meldle/'
+      url: 'https://www.timmytaylors.co.uk'
     })
     .then(() => {
       store.commit('UPDATE_SHARED_DATA', true)
@@ -113,26 +113,26 @@ const share = () => {
   }
 }
 
-const copyResults = async () => {
-  if (!wonGame)
-    return;
-  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
-  try {
-    console.log('copy reached')
-    var type = "text/plain"
-    var blob = new Blob([shareDataText], { type })
-    var data = [new ClipboardItem({ [type]: blob })]
+// const copyResults = async () => {
+//   if (!wonGame)
+//     return;
+//   const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
+//   try {
+//     console.log('copy reached')
+//     var type = "text/plain"
+//     var blob = new Blob([shareDataText], { type })
+//     var data = [new ClipboardItem({ [type]: blob })]
 
-    navigator.clipboard.write(data).then(() => {
-      console.log('successfully written to clipboard!')
-    })
-    .catch((err) => {
-      console.log('could not write data to clipboard: ', err)
-    })
-  } catch (err) {
-    throw new Error('could not write data to clipboard: ', err)
-  }
-}
+//     navigator.clipboard.write(data).then(() => {
+//       console.log('successfully written to clipboard!')
+//     })
+//     .catch((err) => {
+//       console.log('could not write data to clipboard: ', err)
+//     })
+//   } catch (err) {
+//     throw new Error('could not write data to clipboard: ', err)
+//   }
+// }
 
 const submitToColourRow = (colours) => {
   store.commit('SUBMIT_TO_COLOUR_ROW', {index: store.state.currentGuessIndex - 1, value: colours})
