@@ -10,26 +10,27 @@
       </a>
       <div class="stats-values grid gap-2 grid-cols-4">
         <div class="item">
-          <span class="value block text-center text-2xl" v-text="store.state.stats.gamesPlayed"></span>
+          <span class="value block text-center text-2xl font-bold text-blue-400" v-text="store.state.stats.gamesPlayed"></span>
           <span class="label block text-center text-xs">Played</span>
         </div>
         <div class="item">
-          <span class="value block text-center text-2xl" v-text="store.state.stats.winPercentage"></span>
+          <span class="value block text-center text-2xl font-bold text-green-400" v-text="store.state.stats.winPercentage"></span>
           <span class="label block text-center text-xs">Win %</span>
         </div>
         <div class="item">
-          <span class="value block text-center text-2xl" v-text="store.state.stats.currentStreak"></span>
+          <span class="value block text-center text-2xl font-bold text-yellow-400" v-text="store.state.stats.currentStreak"></span>
           <span class="label block text-center text-xs">Current Streak</span>
         </div>
         <div class="item">
-          <span class="value block text-center text-2xl" v-text="store.state.stats.maxStreak"></span>
+          <span class="value block text-center text-2xl font-bold text-red-400" v-text="store.state.stats.maxStreak"></span>
           <span class="label block text-center text-xs">Max Streak</span>
         </div>
       </div>
       <div class="stats-charts my-5">
-        <h5 class="font-bold mb-2">Total Guesses</h5>
-        <div class="chart" v-for="(guess, idx) in guesses" :key="idx">
-          {{idx}}: {{guess}}
+        <h5 class="font-bold mb-3">Average Successful Guesses</h5>
+        <div class="chart flex my-1 items-center" v-for="(guess, idx) in guesses" :key="idx">
+          <div class="chart-label mr-3 font-bold">{{idx}}</div>
+          <div class="chart-bar bg-green-500 px-2 py-1 text-white inline-block hover:bg-green-400" :style="`width: ${calculateWidth(guess)}`">{{guess}}</div>
         </div>
       </div>
     </div>
@@ -52,5 +53,20 @@ const guesses = computed(() => {
   delete guessesFromStore.fail
   return guessesFromStore
 })
+
+const largestGuessRowValue = computed(() => {
+  let newArr = Object.entries(guesses.value)
+  let max = newArr.reduce((prev, curr) => (prev[1] > curr[1]) ? prev : curr)
+  return max[1]
+})
+
+const calculateWidth = (guess) => {
+  const percent = (guess / largestGuessRowValue.value) * 100
+
+  if (percent === 0)
+    return 'auto'
+
+  return `${percent}%`
+}
 
 </script>
