@@ -94,13 +94,13 @@ const handleInput = async (key) => {
 
 const share = () => {
   const shareDataText = wonGame 
-    ? `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.\n\n${getShareDataProgressGrid.value}\n\n Diddleberg.`
-    : `SHAME UPON ME AND MY FAMILY! 💀 I FAILED TODAY'S MELDLE AND HAVE FORFEITED ALL RIGHTS TO FUTURE WENCHING.\n\n${getShareDataProgressGrid.value}\n\n No Diddleberg.`
+    ? `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.\n\n${getShareDataProgressGrid.value}\n\n`
+    : `SHAME UPON ME AND MY FAMILY! 💀 I FAILED TODAY'S MELDLE AND HAVE FORFEITED ALL RIGHTS TO FUTURE WENCHING.\n\n${getShareDataProgressGrid.value}\n\n`
   try {
     navigator.share({
       title: 'MELDLE RESULTS',
       text: shareDataText,
-      url: 'https://ajbates93.github.io/vue-meldle/'
+      url: 'https://www.timmytaylors.co.uk'
     })
     .then(() => {
       store.commit('UPDATE_SHARED_DATA', true)
