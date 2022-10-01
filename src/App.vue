@@ -1,36 +1,38 @@
 <template>
-  <Header />
-  <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app relative">
-    <div class="absolute top-10 left-2/4 text-center z-50 p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="store.state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
-    <div>
-      <word-row
-        v-for="(guess, i) in store.state.guesses"
-        :key="i"
-        :value="guess"
-        :solution="store.state.solution"   
-        :submitted="i < store.state.currentGuessIndex"
-        :shake="store.state.invalidGuess && store.state.currentGuessIndex === i"
-        @submitColourRow="submitToColourRow"
+  <div class="bg-white dark:bg-slate-800">
+    <Header />
+    <div class="flex flex-col h-screen max-w-md mx-auto justify-evenly meldle-app relative">
+      <div class="absolute top-10 left-2/4 text-center z-50 p-2 bg-gray-700 text-white opacity-0 font-bold transition-opacity rounded-md" style="transform: translateX(-50%)" :class="store.state.invalidGuess ? 'animate-fade-in-up opacity-100' : ''" id="notValidWordWarning">Not in word list</div>
+      <div>
+        <word-row
+          v-for="(guess, i) in store.state.guesses"
+          :key="i"
+          :value="guess"
+          :solution="store.state.solution"   
+          :submitted="i < store.state.currentGuessIndex"
+          :shake="store.state.invalidGuess && store.state.currentGuessIndex === i"
+          @submitColourRow="submitToColourRow"
+        />
+      </div>
+      <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold dark:text-white">
+        <span>🍻 Congratulations! Mel would be proud.</span>
+        <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-green-600 text-white button font-bold py-2 px-3">Share</a>
+      </p>
+      <p v-else-if="lostGame" class="inline-flex flex-col items-center justify-center text-center font-bold dark:text-white">
+        😞 Out of tries. No Timmy Taylors for you.
+        <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-red-600 text-white button font-bold py-2 px-3">Share</a>
+      </p>
+      <simple-keyboard 
+        @onKeyPress="handleInput" 
+        :guessedLetters="store.state.guessedLetters"
       />
+      <settings />
     </div>
-    <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
-      <span>🍻 Congratulations! Mel would be proud.</span>
-      <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-green-600 text-white button font-bold py-2 px-3">Share</a>
-    </p>
-    <p v-else-if="lostGame" class="inline-flex flex-col items-center justify-center text-center font-bold">
-      😞 Out of tries. No Timmy Taylors for you.
-      <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-red-600 text-white button font-bold py-2 px-3">Share</a>
-    </p>
-    <simple-keyboard 
-      @onKeyPress="handleInput" 
-      :guessedLetters="store.state.guessedLetters"
-    />
-    <settings />
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, computed } from "vue";
+import { onMounted, computed } from "vue";
 import { useStore } from 'vuex'
 import { SimpleKeyboard, WordRow, Header, Settings } from './components'
 import { validateGuess } from './utils'
@@ -113,27 +115,6 @@ const share = () => {
   }
 }
 
-const copyResults = async () => {
-  if (!wonGame)
-    return;
-  const shareDataText = `I'M A VICTORIOUS MEL! 🏆 I GOT TODAY'S MELDLE IN ${store.state.currentGuessIndex} ${store.state.currentGuessIndex === 1 ? 'TRY' : 'TRIES'}.`
-  try {
-    console.log('copy reached')
-    var type = "text/plain"
-    var blob = new Blob([shareDataText], { type })
-    var data = [new ClipboardItem({ [type]: blob })]
-
-    navigator.clipboard.write(data).then(() => {
-      console.log('successfully written to clipboard!')
-    })
-    .catch((err) => {
-      console.log('could not write data to clipboard: ', err)
-    })
-  } catch (err) {
-    throw new Error('could not write data to clipboard: ', err)
-  }
-}
-
 const submitToColourRow = (colours) => {
   store.commit('SUBMIT_TO_COLOUR_ROW', {index: store.state.currentGuessIndex - 1, value: colours})
 }
@@ -174,12 +155,6 @@ const webShareApiSupported = computed(() => {
   return navigator.share
 })
 
-// const getWinPercentage = (played, won) => {
-//   const p = Number(played)
-//   const w = Number(won)
-//   return (w / p) * 100
-// }
-
 onMounted(() => {
   store.dispatch('fetchProgress')
   store.dispatch('stats/fetchStats')
@@ -199,5 +174,13 @@ onMounted(() => {
 <style>
 .meldle-app {
   min-height: 650px;
+}
+.dark .simple-keyboard {
+  background-color: rgba(0,0,0,0.2);
+}
+.dark .simple-keyboard .hg-button {
+  background-color: rgba(0,0,0,0.3);
+  color: #ddd;
+  border-bottom: 1px solid #454545;
 }
 </style>

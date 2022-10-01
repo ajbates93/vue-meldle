@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^9.3.0",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.6",
     "simple-keyboard": "^3.4.44",
