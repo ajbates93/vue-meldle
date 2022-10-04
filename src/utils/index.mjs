@@ -1,3 +1,5 @@
+import { addDays } from 'date-fns'
+
 const words = [
   {word: "melba", date: new Date("02/04/2022").toDateString()}, 
   {word: "norks", date: new Date("02/05/2022").toDateString()}, 
@@ -47,9 +49,21 @@ const validateGuess = async (guess) => {
   return valid
 }
 
+const getIndex = (date) => {
+  let start = new Date(2022, 0, 0)
+  let index = -1
+  do {
+    index++
+    start = addDays(start, 1)
+  } while (start <= date)
+
+  return index
+} 
+
 const getWordOfTheDay = async (date) => {
-  const wordIndex = words.findIndex(x => x.date == date)
-  if (wordIndex === -1) {
+  const customWordIndex = words.findIndex(x => x.date == date)
+  if (customWordIndex === -1) {
+    const wordIndex = getIndex(date)
     const wotd = JSON.parse(localStorage.getItem("meldle-wotd"))
     if (!wotd || wotd.date !== date) {
       const answers = await fetch('answers.txt')
@@ -57,8 +71,9 @@ const getWordOfTheDay = async (date) => {
   
       const aWords = answers.replace(/(\r\n|\n|\r)/gm, "\n")
       const lines = aWords.split('\n')
-      const random = lines[Math.floor(Math.random() * lines.length)].toUpperCase()
-      const word = { word: random, date: new Date().toDateString() }
+      // const random = lines[Math.floor(Math.random() * lines.length)].toUpperCase()
+      const wordFromList = lines[wordIndex % lines.length]
+      const word = { word: wordFromList, date: new Date().toDateString() }
       
       setWordOfTheDay(word)
 
@@ -68,7 +83,7 @@ const getWordOfTheDay = async (date) => {
       return wotd.word
   }
   else {
-    const word = { word: words[wordIndex].word, date: new Date().toDateString() }
+    const word = { word: words[customWordIndex].word, date: new Date().toDateString() }
     setWordOfTheDay(word)
     return word.word
   }
