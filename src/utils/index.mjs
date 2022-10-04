@@ -1,4 +1,6 @@
 import { addDays } from 'date-fns'
+import { WORDS } from './wordlist'
+import { VALID } from './valid'
 
 const words = [
   {word: "melba", date: new Date("02/04/2022").toDateString()}, 
@@ -40,22 +42,18 @@ const words = [
 const validateGuess = async (guess) => {
   const lc = guess.toLowerCase()
   
-  const allowed = await fetch('allowed.txt')
-    .then(response => response.text())
-  
-  const aWords = allowed.replace(/(\r\n|\n|\r)/gm, "");
-
-  const valid = aWords.includes(lc)
+  const valid = VALID.includes(lc)
   return valid
 }
 
 const getIndex = (date) => {
+  let gameDate = new Date(date)
   let start = new Date(2022, 0, 0)
   let index = -1
   do {
     index++
     start = addDays(start, 1)
-  } while (start <= date)
+  } while (start <= gameDate)
 
   return index
 } 
@@ -66,14 +64,9 @@ const getWordOfTheDay = async (date) => {
     const wordIndex = getIndex(date)
     const wotd = JSON.parse(localStorage.getItem("meldle-wotd"))
     if (!wotd || wotd.date !== date) {
-      const answers = await fetch('answers.txt')
-        .then(response => response.text())
-  
-      const aWords = answers.replace(/(\r\n|\n|\r)/gm, "\n")
-      const lines = aWords.split('\n')
-      // const random = lines[Math.floor(Math.random() * lines.length)].toUpperCase()
-      const wordFromList = lines[wordIndex % lines.length]
-      const word = { word: wordFromList, date: new Date().toDateString() }
+
+      const wordFromList = WORDS[wordIndex % WORDS.length]
+      const word = { word: wordFromList.toLocaleUpperCase(), date: new Date().toDateString() }
       
       setWordOfTheDay(word)
 
