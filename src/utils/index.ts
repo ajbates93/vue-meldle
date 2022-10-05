@@ -62,7 +62,7 @@ const getWordOfTheDay = async (date) => {
   const customWordIndex = words.findIndex(x => x.date == date)
   if (customWordIndex === -1) {
     const wordIndex = getIndex(date)
-    const wotd = JSON.parse(localStorage.getItem("meldle-wotd"))
+    const wotd = JSON.parse(localStorage.getItem("meldle-wotd") ?? "")
     if (!wotd || wotd.date !== date) {
 
       const wordFromList = WORDS[wordIndex % WORDS.length]

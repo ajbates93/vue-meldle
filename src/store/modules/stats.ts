@@ -26,7 +26,7 @@ const state = {
 
 const actions = {
   fetchStats({state, commit}) {
-    const stats = JSON.parse(localStorage.getItem("meldle-stats"))
+    const stats = JSON.parse(localStorage.getItem("meldle-stats") ?? "")
     if (!stats) {
       const newStats = JSON.stringify({ ...state })
       window.localStorage.setItem("meldle-stats", newStats)

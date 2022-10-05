@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import { getWordOfTheDay } from '../utils/index.mjs'
+import { getWordOfTheDay } from '../utils/index.js'
 
 import stats from './modules/stats'
 import settings from './modules/settings'
@@ -9,7 +9,21 @@ const date = new Date(today).toDateString()
 
 const solution = await getWordOfTheDay(date)
 
-const store = createStore({
+interface State {
+  solution: any,
+  guesses: string[],
+  coloursGrid: [][],
+  invalidGuess: boolean,
+  currentGuessIndex: number,
+  guessedLetters: {
+    miss: any[],
+    found: any[],
+    hint: any[]
+  },
+  sharedData: boolean
+}
+
+const store = createStore<State>({
   state() {
     return {
       solution: solution,
@@ -65,7 +79,7 @@ const store = createStore({
   },
   actions: {
     fetchProgress({commit, state}) {
-      const progress = JSON.parse(localStorage.getItem("meldle-progress"))
+      const progress = JSON.parse(localStorage.getItem("meldle-progress") ?? "")
       const today = new Date().toDateString()
 
       if (!progress) {
