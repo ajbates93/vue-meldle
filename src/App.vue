@@ -16,11 +16,11 @@
       </div>
       <p v-if="wonGame" class="inline-flex flex-col items-center justify-center text-center font-bold dark:text-white">
         <span>🍻 Congratulations! Mel would be proud.</span>
-        <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-green-600 text-white button font-bold py-2 px-3">Share</a>
+        <button v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-green-600 text-white button font-bold py-2 px-3">Share</button>
       </p>
       <p v-else-if="lostGame" class="inline-flex flex-col items-center justify-center text-center font-bold dark:text-white">
         😞 Out of tries. No Timmy Taylors for you.
-        <a href="javascript:void(0)" v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-red-600 text-white button font-bold py-2 px-3">Share</a>
+        <button v-if="webShareApiSupported" @click="share" class="mt-5 rounded text-xl bg-red-600 text-white button font-bold py-2 px-3">Share</button>
       </p>
       <simple-keyboard 
         @onKeyPress="handleInput" 

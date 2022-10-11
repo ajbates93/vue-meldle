@@ -3,11 +3,11 @@
   <div class="z-50 w-2/4 fixed p-5 top-2/4 left-2/4 bg-white dark:bg-slate-800 shadow-xl rounded-lg transition-all" style="transform: translate(-50%, -50%); max-width: 350px; min-width: 300px;" :class="store.state.settings.showSettings ? 'opacity-100 visible' : 'opacity-0 hidden'">
     <div class="relative">
       <h3 class="text-center font-bold text-xl mb-5 dark:text-white">Statistics</h3>
-      <a @click="close" class="absolute right-0 top-0 dark:text-white" href="javascript:void(0)">
+      <button @click="close" class="absolute right-0 top-0 dark:text-white">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </a>
+      </button>
       <div class="stats-values grid gap-2 grid-cols-4 dark:text-white">
         <div class="item">
           <span class="value block text-center text-2xl font-bold text-blue-400" v-text="store.state.stats.gamesPlayed"></span>
